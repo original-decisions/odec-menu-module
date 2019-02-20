@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Menu server model.</Description>
+    <Copyright>Original Decisions</Copyright>
+    <VersionPrefix>1.0.1</VersionPrefix>
+    <Authors>Mary Pirogova &lt;mashijob@yandex.ru&gt;;Alex Pirogov &lt;pirjob@yandex.ru&gt;</Authors>
+    <TargetFrameworks>netcoreapp1.0;net452;netcoreapp2.1</TargetFrameworks>
+    <AssemblyName>odec.CP.Server.Model.Menu</AssemblyName>
+    <PackageId>odec.CP.Server.Model.Menu</PackageId>
+    <PackageTags>Menu;Server Model;odec;Original Decisions</PackageTags>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dotnet5.6</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="odec.CP.Server.Model.HtmlElements" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' Or  '$(TargetFramework)' == 'netcoreapp1.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.1.4" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452'">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Menu.Abst\odec.CP.Server.Model.Menu.Abst.csproj" />
+  </ItemGroup>
+
+</Project>

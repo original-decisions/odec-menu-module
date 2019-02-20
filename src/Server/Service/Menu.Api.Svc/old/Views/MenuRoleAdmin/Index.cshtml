@@ -1,0 +1,124 @@
+﻿@using odec.Menu.WebUI.Resources
+@model odec.Menu.ViewModels.Specific.MenuAdminIndexVm<int, int?>
+
+@{
+    ViewBag.Title = AdminIndexResource.Title;
+}
+@section css{
+
+    <link href="~/Content/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+    <style>
+        .ui-jqgrid .ui-jqgrid-hbox {
+            padding-right: inherit;
+        }
+    </style>
+}
+<h2>@ViewBag.Title</h2>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        @AdminIndexResource.GlossariesConfigHeading
+    </div>
+    <div class="panel-body">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="usrInfoHeading" data-toggle="collapse" data-target="#usrInfo" aria-expanded="true" aria-controls="usrInfo">
+                    <h4 class="panel-title">
+                        @MenuItemRelationGroupResource.Title
+                    </h4>
+                </div>
+                <div id="usrInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="usrInfoHeading">
+                    <div class="panel-body">
+                        @Html.Partial("_createMenuItemRelationGroup")
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading collapsed" role="tab" id="friendsHeading" aria-expanded="false" aria-controls="friendsTab" data-toggle="collapse" data-target="#friendsTab">
+                    <h4 class="panel-title">
+                        @RouteNameResource.AdminTitle
+                    </h4>
+                </div>
+                <div id="friendsTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="friendsHeading">
+                    <div class="panel-body">
+                        <div class="row">
+                            @Html.Partial("_createRouteName")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading collapsed" role="tab" data-target="#albumsTab" aria-controls="albumsTab" data-toggle="collapse" id="albumsHeading" aria-expanded="false">
+                    <h4 class="panel-title">
+                        @RouteParamResource.AdminTitle
+                    </h4>
+                </div>
+                <div id="albumsTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="albumsHeading">
+                    <div class="panel-body">
+                        @Html.Partial("_createRouteParam")
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading collapsed" role="tab" data-target="#createParameter" aria-controls="albumsTab" data-toggle="collapse" id="albumsHeading" aria-expanded="false">
+                    <h4 class="panel-title">
+                        TODO:Move to resource. Menu item relations
+                    </h4>
+                </div>
+                <div id="createParameter" class="panel-collapse collapse" role="tabpanel" aria-labelledby="createParameterHeading">
+                    <div class="panel-body">
+                        @Html.Partial("_menuItemRelations")
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div id="MenuRelationRouteValueHeading" class="panel-heading collapsed" role="tab" data-toggle="collapse" data-target="#MenuRelationRouteValue" ria-expanded="false" aria-controls="MenuRelationRouteValue">
+                    <h4 class="panel-title">
+                        TODO:Move to resource. Add Route parameters to Menu element
+                    </h4>
+                </div>
+                
+                <div id="MenuRelationRouteValue" class="panel-collapse collapse" role="tabpanel" aria-labelledby="MenuRelationRouteValueHeading">
+                     @Html.Partial("_menuItemRelationsRouteValues")
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading collapsed" role="tab" data-toggle="collapse" id="hobbiesHeading" data-target="#hobbiesTab" aria-expanded="false" aria-controls="hobbiesTab">
+                    <h4 class="panel-title">
+                        @RouteMenuItemResource.Title
+                    </h4>
+                </div>
+                <div id="hobbiesTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="hobbiesHeading">
+                    <div class="panel-body">
+                        @Html.Partial("_createMenuItem")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <canvas id="viewport" width="800" height="600"></canvas>
+    </div>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/mAjax")
+
+    <script src="~/Scripts/free-jqGrid/jquery.jqGrid.js"></script>
+    <script src="~/Scripts/context-menu.js"></script>
+    @*<script src="~/Scripts/free-jqGrid/jquery.jqgrid.src.js"></script>*@
+    <script src="~/Scripts/free-jqGrid/i18n/grid.locale-en.js"></script>
+    <script src="~/Scripts/modules.js"></script>
+    <script src="~/Scripts/utils.module.js"></script>
+    @Html.Partial("_IndexScripts", Model)
+
+
+}

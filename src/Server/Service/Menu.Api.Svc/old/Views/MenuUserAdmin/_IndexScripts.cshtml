@@ -1,0 +1,606 @@
+﻿@using Newtonsoft.Json
+@model odec.Menu.ViewModels.Specific.MenuAdminIndexVm<int, int?>
+
+<script>
+    //  $.jgrid.defaults.responsive = true;
+    $.jgrid.defaults.styleUI = 'Bootstrap';
+    $.jgrid.defaults.width = 'auto';
+    (function($) {
+
+        var routes = {
+            saveMenuItem: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "SaveMenuItem"})',
+            saveRouteName: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "SaveRouteName"})',
+            saveRouteParam: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "SaveRouteParamName"})',
+            saveMenuItemGroup: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "SaveMenuItemRelationGroup"})',
+            getMenuItemGroups: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "GetMenuRelationGroups"})',
+            getMenuItems: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "GetMenuItems"})',
+            getRouteNames: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "GetRouteNames"})',
+            getRouteParams: '@Url.RouteUrl("Default", new {controller = "MenuAdmin", action = "GetRouteParams"})',
+            getMenuItemRelations: '@Url.RouteUrl("Default", new { controller = "MenuUserAdmin", action = "GetMenuRelations" })',
+            saveMenuItemRelation: '@Url.RouteUrl("Default", new {controller ="MenuUserAdmin", action="SaveMenuItemRelation"})',
+            getMenuItemRelationRouteParams: '@Url.RouteUrl("Default",new {controller="MenuUserAdmin",action ="GetMenuItemRelationParams"})',
+            saveMenuItemRelationRouteParam: '@Url.RouteUrl("Default",new {controller="MenuUserAdmin",action ="SaveMenuItemRelationParam"})',
+            accessDenied: ''
+        };
+
+        $.modules.menuAdministration = function (menuAdministrationVm) {
+            var self = this;
+            self.utils = {};
+            self.vm = menuAdministrationVm;
+            self.utils.gridOptions = {
+
+                datatype: "json",
+                mtype: "POST",
+                jsonreader: {
+                    page: "page",
+                    total: "total",
+                    records: "records",
+                    root: "rows",
+                    repeatitems: false,
+                    id: "routeParamGlossaryGrid"
+                },
+                styleUI : 'Bootstrap',
+                colNames: ['Id', 'Name', 'Code', 'SortOrder', 'IsActive'],
+                colModel: [
+                    { name: 'Id', index: 'Id', width: 100,key:true, sortable: false, editable: false, cellattr: function() { return 'style="white-space: normal;"'; } },
+                    { name: 'Name', index: 'Name', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                    { name: 'Code', index: 'Code', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                    { name: 'SortOrder', index: 'SortOrder', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                    { name: 'IsActive', index: 'IsActive', width: 100, sortable: true,editable: true, formatter: "checkbox",edittype:"checkbox",editoptions:{value:"true:false"}, cellattr: function() { return 'style="white-space: normal;"'; } }
+                ],
+                width: 'auto',
+                height: 'auto',
+                viewrecords: true,
+                cellEdit: true,
+                multiselect: true,
+                rowNum: 20,
+                rowList: [10, 20, 100],
+                sortname: 'Name',
+                sortorder: 'desc'
+            };
+            self.utils.gridPagerOptions = {
+                pager:{ edit: true, add: true, del: false, search: true, refresh: false, view: false, position: "left", cloneToTop: false },
+                // options for the Edit Dialog
+                edit:{
+                    editCaption: "The Edit Dialog",
+                    recreateForm: true,
+                    checkOnUpdate : true,
+                    checkOnSubmit : true,
+                    closeAfterEdit: true,
+                    errorTextFormat: function (data) {
+                        return 'Error: ' + data.responseText;
+                    }
+                },
+                // options for the Add Dialog
+                add:{
+                    closeAfterAdd: true,
+                    recreateForm: true,
+                    errorTextFormat: function (data) {
+                        return 'Error: ' + data.responseText;
+                    }
+                },
+                // options for the Delete Dailog
+                del:{
+                    errorTextFormat: function (data) {
+                        return 'Error: ' + data.responseText;
+                    }
+                }};
+            self.dom = function () {
+                return {
+                    routeParam: {
+                        grid: $('#RouteParamGrid')
+                    },
+                    menuItem: {
+                        grid: $('#MenuItemGrid')
+                    },
+                    routeName: {
+                        grid: $('#RouteNameGrid')
+                    },
+                    menuItemRelationGroup: {
+                        grid: $('#MenuItemRelationGroupGrid')
+                    },
+                    menuItemRelation: {
+                        grid: $('#MenuItemRelationsGrid')
+                    },
+                    menuItemRelationRouteValues: {
+                        grid : $('#MenuItemRelationRouteValuesGrid')
+                    }
+                }
+            };
+
+            self.menuItemRelationGroup = {
+                save: function () {
+                    self.dom().menuItemRelationGroup.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+                    //var $this = $(this);
+                    //var $url = $this.data('url');
+                    //var $dependent = $this.data('dependent-on');
+                    //var $data = { attachments: $.parseJSON($($dependent).val()) };
+                    //var options =
+                    //{
+                    //    url: $url,
+                    //    method: 'POST',
+                    //    dataType: 'json',
+                    //    data: JSON.stringify($data),
+                    //    contentType: "application/json; charset=utf-8",
+                    //    cache: false
+                    //};
+                    //$.ajax(options).done(function (data){ self.attachments.removeSucceeded(data,$dependent);});
+                },
+                onSaveSucceed : function (data, textStatus, jqXHR){},
+                update: function (data,dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function () {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getMenuItemGroups,
+
+                        editurl: routes.saveMenuItemGroup,
+                        pager: "#MenuItemRelationGroupPager",
+                        caption: "Menu Item Groups",
+                        jsonreader: {
+                            id: "menuItemRelationGroupGlossaryGrid"
+                        }
+                    }),
+                    formatters: {
+
+                    },
+                    init : function() {
+                        self.dom().menuItemRelationGroup.grid.jqGrid(self.menuItemRelationGroup.grid.options);
+                        self.dom().menuItemRelationGroup.grid.navGrid('#MenuItemRelationGroupPager',
+                            self.utils.gridPagerOptions.pager,
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            self.utils.gridPagerOptions.del);
+                    }
+                }
+            };
+            self.menuItem = {
+                save: function () {
+                    self.dom().menuItem.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+                    //var $this = $(this);
+                    //var $url = $this.data('url');
+                    //var $dependent = $this.data('dependent-on');
+                    //var $data = { attachments: $.parseJSON($($dependent).val()) };
+                    //var options =
+                    //{
+                    //    url: $url,
+                    //    method: 'POST',
+                    //    dataType: 'json',
+                    //    data: JSON.stringify($data),
+                    //    contentType: "application/json; charset=utf-8",
+                    //    cache: false
+                    //};
+                    //$.ajax(options).done(function (data){ self.attachments.removeSucceeded(data,$dependent);});
+                },
+                onSaveSucceed : function (data, textStatus, jqXHR){},
+                update: function (data,dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function () {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getMenuItems,
+                        editurl: routes.saveMenuItem,
+                        pager: "#MenuItemPager",
+                        caption: "Menu Items",
+                        jsonreader: {
+                            id: "menuItemGlossaryGrid"
+                        }
+                    }),
+                    formatters: {
+                    },
+                    init : function() {
+                        self.dom().menuItem.grid.jqGrid(self.menuItem.grid.options);
+                        self.dom().menuItem.grid.navGrid('#MenuItemPager',
+                            self.utils.gridPagerOptions.pager,
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            self.utils.gridPagerOptions.del);
+                    }
+                }
+            };
+            self.routeParam = {
+                save: function() {
+                    self.dom().routeParam.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+                    //var $this = $(this);
+                    //var $url = $this.data('url');
+                    //var $dependent = $this.data('dependent-on');
+                    //var $data = { attachments: $.parseJSON($($dependent).val()) };
+                    //var options =
+                    //{
+                    //    url: $url,
+                    //    method: 'POST',
+                    //    dataType: 'json',
+                    //    data: JSON.stringify($data),
+                    //    contentType: "application/json; charset=utf-8",
+                    //    cache: false
+                    //};
+                    //$.ajax(options).done(function (data){ self.attachments.removeSucceeded(data,$dependent);});
+                },
+                onSaveSucceed: function(data, textStatus, jqXHR) {},
+                update: function(data, dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function() {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getRouteParams,
+                        editurl: routes.saveRouteParam,
+                        pager: "#RouteParamPager",
+                        caption: "Route Parameter Names",
+                        jsonreader: {
+                            id: "routeParamGlossaryGrid"
+                        }
+                    }),
+                    formatters: {
+
+                    },
+                    init : function() {
+                        self.dom().routeParam.grid.jqGrid(self.routeParam.grid.options);
+                        self.dom().routeParam.grid.navGrid('#RouteParamPager',
+                            self.utils.gridPagerOptions.pager,
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            self.utils.gridPagerOptions.del);
+                    }
+                }
+            };
+            self.routeName = {
+                save: function () {
+
+                    self.dom().routeName.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+
+                    //var $this = $(this);
+                    //var $url = $this.data('url');
+                    //var $dependent = $this.data('dependent-on');
+                    //var $data = { attachments: $.parseJSON($($dependent).val()) };
+                    //var options =
+                    //{
+                    //    url: $url,
+                    //    method: 'POST',
+                    //    dataType: 'json',
+                    //    data: JSON.stringify($data),
+                    //    contentType: "application/json; charset=utf-8",
+                    //    cache: false
+                    //};
+                    //$.ajax(options).done(function (data){ self.attachments.removeSucceeded(data,$dependent);});
+                },
+                onSaveSucceed : function (data, textStatus, jqXHR){},
+                update: function (data,dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function () {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getRouteNames,
+                        editurl: routes.saveRouteName,
+                        pager: "#RouteNamePager",
+                        caption: "Route Names",
+                        jsonreader: {
+                            id: "routeNameGlossaryGrid"
+                        },
+                        gridComplete: function() {
+                            $(this).contextMenu('contextMenu', {
+                                menuStyle: {
+                                    width: "150px"
+                                },
+                                bindings: {
+                                    'edit': function(t) {
+                                        alert("Edit Row Command Selected");
+                                    },
+                                    'add': function(t) {
+                                        alert("Add Row Command Selected");
+                                    },
+                                    'del': function(t) {
+                                        alert("Delete Row Command Selected");
+                                    }
+                                },
+                                onContextMenu: function(event, menu) {
+                                    var rowId = $(event.target).parent("tr").attr("id");
+                                    var grid = self.dom().routeName.grid;
+                                    grid.setSelection(rowId);
+
+                                    return true;
+                                }
+                            });
+                        }
+                    }),
+                    formatters: {
+
+                    },
+                    init : function() {
+                        self.dom().routeName.grid.jqGrid(self.routeName.grid.options);
+                        self.dom().routeName.grid.navGrid('#RouteNamePager',
+                            self.utils.gridPagerOptions.pager,
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            self.utils.gridPagerOptions.del);
+                        // self.dom().routeName.grid.jqGrid('navGrid', , { add: true, edit: true, del: true, search: true, refresh: true});
+                    }
+                },
+                example: function(data, textStatus, jqXHR) {
+
+                    //var ct = jqXHR.getResponseHeader("content-type") || "";
+                    //if (ct.indexOf('html') > -1) {
+                    //    var domSnapshot = self.dom();
+                    //    var statuses = domSnapshot.status.Id;
+                    //    if (statuses.exists() && (statuses.val() != undefined && statuses.val() != '' && statuses.val() != "0")) {
+                    //        if (statuses.data('cascadeRefresh') == undefined) {
+                    //            statuses.cascadeRefresh();
+                    //        }
+                    //        if (statuses.data('chosen') != undefined) {
+                    //            statuses.trigger('chosen:updated');
+                    //        } else {
+                    //            statuses.chosen();
+                    //        }
+                    //        statuses.trigger('change.cascade');
+                    //        //$(".subStatusesRow").elRefresh({});
+                    //    };
+                    //}
+                    //if (ct.indexOf('json') > -1) {
+                    //    // handle json here
+                    //}
+                }
+            };
+            self.menuItemRelation = {
+                save: function () {
+                    self.dom().menuItemRelation.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+//$.ajax(options).done(function (data){ self.attachments.removeSucceeded(data,$dependent);});
+                },
+                onSaveSucceed : function (data, textStatus, jqXHR){},
+                update: function (data,dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function () {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getMenuItemRelations,
+                        editurl: routes.saveMenuItemRelation,
+                        pager: "#MenuItemRelationsPager",
+                        caption: "Menu Item Relations",
+                        colNames: ['Id', 'Login', 'Menu Item Code', 'Route Name Code', 'Group Code','Is Docked','Is Public'],
+                        colModel: [
+                            { name: 'Id', index: 'Id', width: 100,key:true, sortable: false, editable: false, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'Login', index: 'Login', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'MenuCode', index: 'MenuCode', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'RouteCode', index: 'RouteCode', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'MenuItemRelationGroupCode', index: 'MenuItemRelationGroupCode', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'IsDocked', index: 'IsDocked', width: 100, sortable: true,editable: true, formatter: "checkbox",edittype:"checkbox",editoptions:{value:"true:false"}, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'IsPublic', index: 'IsPublic', width: 100, sortable: true,editable: true, formatter: "checkbox",edittype:"checkbox",editoptions:{value:"true:false"}, cellattr: function() { return 'style="white-space: normal;"'; } }
+
+                        ],
+                        jsonreader: {
+                            id: "menuItemRelationsGrid"
+                        },
+                        gridComplete: function() {
+                            $(this).contextMenu('contextMenu', {
+                                menuStyle: {
+                                    width: "150px"
+                                },
+                                bindings: {
+                                    'edit': function(t) {
+                                        alert("Edit Row Command Selected");
+                                    },
+                                    'add': function(t) {
+                                        alert("Add Row Command Selected");
+                                    },
+                                    'del': function(t) {
+                                        alert("Delete Row Command Selected");
+                                    }
+                                },
+                                onContextMenu: function(event, menu) {
+                                    var rowId = $(event.target).parent("tr").attr("id");
+                                    var grid = self.dom().routeName.grid;
+                                    grid.setSelection(rowId);
+
+                                    return true;
+                                }
+                            });
+                        }
+                    }),
+                    formatters: {
+
+                    },
+                    init : function() {
+                        self.dom().menuItemRelation.grid.jqGrid(self.menuItemRelation.grid.options);
+                        self.dom().menuItemRelation.grid.navGrid('#MenuItemRelationsPager',
+                            $.extend({},self.utils.gridPagerOptions.pager, {
+                                pager: { 
+                                    edit: true,
+                                    add: true, 
+                                    del: true, 
+                                    search: true, 
+                                    refresh: true, 
+                                    view: true, position: "left", cloneToTop: false }
+                            }),
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            self.utils.gridPagerOptions.del);
+                        // self.dom().routeName.grid.jqGrid('navGrid', , { add: true, edit: true, del: true, search: true, refresh: true});
+                    }
+                },
+                example: function(data, textStatus, jqXHR) {
+
+                    //var ct = jqXHR.getResponseHeader("content-type") || "";
+                    //if (ct.indexOf('html') > -1) {
+                    //    var domSnapshot = self.dom();
+                    //    var statuses = domSnapshot.status.Id;
+                    //    if (statuses.exists() && (statuses.val() != undefined && statuses.val() != '' && statuses.val() != "0")) {
+                    //        if (statuses.data('cascadeRefresh') == undefined) {
+                    //            statuses.cascadeRefresh();
+                    //        }
+                    //        if (statuses.data('chosen') != undefined) {
+                    //            statuses.trigger('chosen:updated');
+                    //        } else {
+                    //            statuses.chosen();
+                    //        }
+                    //        statuses.trigger('change.cascade');
+                    //        //$(".subStatusesRow").elRefresh({});
+                    //    };
+                    //}
+                    //if (ct.indexOf('json') > -1) {
+                    //    // handle json here
+                    //}
+                }
+            };
+            self.menuItemRelationRouteValues = {
+                save: function () {
+                    self.dom().menuItemRelationRouteValues.grid.setGridParam({ page: 1 }).trigger('reloadGrid');
+                },
+                onSaveSucceed : function (data, textStatus, jqXHR){},
+                update: function (data,dependent) {
+
+                },
+                onUpdateSucceed: function(data, textStatus, jqXHR) {
+
+                },
+                remove: function () {
+
+                },
+                grid: {
+                    options: $.extend({},self.utils.gridOptions, {
+                        url: routes.getMenuItemRelationRouteParams,
+                        editurl: routes.saveMenuItemRelationRouteParam,
+                        pager: "#MenuItemRelationRouteValuesPager",
+                        caption: "Menu Item Relation Route Values",
+                        colNames: ["Menu Item","Route Name",'Relation Id', 'Parameter Code', 'Parameter Value'],
+                        colModel: [
+                            { name: 'MenuItemRelation.MenuItem.Name', index: 'RouteParam.Code', width: 100, sortable: true,editable: false, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'MenuItemRelation.RouteName.Name', index: 'RouteParam.Code', width: 100, sortable: true,editable: false, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'MenuItemRelationId', index: 'MenuItemRelationId', width: 100, sortable: false, editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'RouteParam.Code', index: 'RouteParam.Code', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                            { name: 'Value', index: 'Value', width: 100, sortable: true,editable: true, cellattr: function() { return 'style="white-space: normal;"'; } },
+                        ],
+                        jsonreader: {
+                            id: "menuItemRelationRouteValuesGrid"
+                        },
+                        gridComplete: function() {
+                            $(this).contextMenu('contextMenu', {
+                                menuStyle: {
+                                    width: "150px"
+                                },
+                                bindings: {
+                                    'edit': function(t) {
+                                        alert("Edit Row Command Selected");
+                                    },
+                                    'add': function(t) {
+                                        alert("Add Row Command Selected");
+                                    },
+                                    'del': function(t) {
+                                        alert("Delete Row Command Selected");
+                                    }
+                                },
+                                onContextMenu: function(event, menu) {
+                                    var rowId = $(event.target).parent("tr").attr("id");
+                                    var grid = self.dom().menuItemRelationRouteValues.grid;
+                                    grid.setSelection(rowId);
+
+                                    return true;
+                                }
+                            });
+                        }
+                    }),
+                    formatters: {
+
+                    },
+                    init : function() {
+                        self.dom().menuItemRelationRouteValues.grid.jqGrid(self.menuItemRelationRouteValues.grid.options);
+                        self.dom().menuItemRelationRouteValues.grid.navGrid('#MenuItemRelationRouteValuesPager',
+                            $.extend({},self.utils.gridPagerOptions.pager, {
+                                pager: { 
+                                    edit: true,
+                                    add: true, 
+                                    del: true, 
+                                    search: true, 
+                                    refresh: true, 
+                                    view: true, position: "left", cloneToTop: false }
+                            }),
+                            self.utils.gridPagerOptions.edit,
+                            self.utils.gridPagerOptions.add,
+                            $.extend({},self.utils.gridPagerOptions.del, {
+                                delData: {
+                                    MenuItemRelationId: function() {
+                                        var grid = self.dom().menuItemRelationRouteValues.grid;
+                                        var sel_id = grid.jqGrid('getGridParam', 'selrow');
+                                        var value = grid.jqGrid('getCell', sel_id, 'MenuItemRelationId');
+                                        return value;
+                                    },
+                                    RouteParamCode: function() {
+                                        var grid = self.dom().menuItemRelationRouteValues.grid;
+                                        var sel_id = grid.jqGrid('getGridParam', 'selrow');
+                                        var value = grid.jqGrid('getCell', sel_id, 'RouteParam.Code');
+                                        return value;
+                                    }
+                                }
+                                    
+                            }));
+                        // self.dom().routeName.grid.jqGrid('navGrid', , { add: true, edit: true, del: true, search: true, refresh: true});
+                    }
+                }
+            };
+            //self.validate = function () {
+            //    return self.dom().mainForm.validate({
+            //        errorPlacement: function(error, element) {
+            //            if (element.is("select")) {
+            //                element.parent().append(error);
+            //            } else {
+            //                error.insertAfter(element);
+            //            }
+            //        },
+            //        ignore: ":hidden:not(select)"
+            //    });
+            //};
+            //  self.validator = self.validate();
+
+        };
+        $.modules.menuAdministration.init = function (menuAdministrationVm) {
+            var result = new $.modules.menuAdministration(menuAdministrationVm);
+            var domSnapshot = result.dom();
+
+            result.routeParam.grid.init();
+            result.menuItem.grid.init();
+            result.routeName.grid.init();
+            result.menuItemRelationGroup.grid.init();
+            result.menuItemRelation.grid.init();
+            result.menuItemRelationRouteValues.grid.init();
+            $.modules.utils.jqGrid.removeHardcodedWidth();
+            return result;
+        };
+
+        $(document).ready(function () {
+            var adminVm = @Html.Raw(JsonConvert.SerializeObject(Model));
+            console.log(adminVm);
+            $.modules.menuAdministration.get= $.modules.menuAdministration.init(adminVm);
+        });
+        $(document).ajaxComplete(function () {
+            var module = $.modules.menuAdministration.get;
+
+        });
+    })(jQuery);
+</script>

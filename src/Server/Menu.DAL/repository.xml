@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net">
+  <object id="MenuRepository" name="MenuRepository"
+      type="odec.Menu.DAL.MenuRepository, odec.Menu.DAL">
+  </object>
+  <object id="MenuItemRelationRepository" name="MenuItemRelationRepository"
+    type="odec.Menu.DAL.MenuItemRelationRepository, odec.Menu.DAL">
+  </object>
+ <object id="RouteNameRepository" name="RouteNameRepository"
+      type="odec.Menu.DAL.RouteNameRepository, odec.Menu.DAL">
+  </object>
+   <object id="MenuItemRepository" name="MenuItemRepository"
+      type="odec.Menu.DAL.MenuItemRepository, odec.Menu.DAL">
+  </object>
+  
+  <object id="RouteParamRepository" name="RouteParamRepository"
+      type="odec.Menu.DAL.RouteParamRepository, odec.Menu.DAL">
+  </object>
+  <object id="MenuItemRelationGroupRepository" name="MenuItemRelationGroupRepository"
+      type="odec.Menu.DAL.MenuItemRelationGroupRepository, odec.Menu.DAL">
+  </object>
+</objects>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net">
+  <object id="RoleBasedMenuRepository" name="RoleBasedMenuRepository"
+    type="odec.Membership.Menu.DAL.RoleBasedMenuRepository, odec.Membership.Menu.DAL">
+  </object>
+  <object id="MenuItemRoleRelationRepository" name="MenuItemRoleRelationRepository"
+    type="odec.Membership.Menu.DAL.MenuItemRoleRelationRepository, odec.Membership.Menu.DAL">
+  </object>
+</objects>
